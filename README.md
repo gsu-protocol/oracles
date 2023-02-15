@@ -211,7 +211,7 @@ This is based on libp2p which is a peer-to-peer networking protocol designed to 
         "directPeersAddrs":[]}}
   ```
 
- **this attribute is reponsible for the making the peers, So we have to give the info like `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median.** 
+ **this attribute is reponsible for the making the peers, So we have to give the info for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median.** 
 
 You can get the peer address from the logs of spire, As we are running systemd services, So we have to use journalctl for getting the logs.
 
