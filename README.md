@@ -179,6 +179,10 @@ The setup scripts can also be used configure Omnia as a feed running with `syste
 
 sudo ./setup/run_feed.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
 
+for example:
+
+sudo ./setup/run_feed.sh --gofer /home/oracles/gofer.json --omnia /home/oracles/omnia_feed.json --spire /home/oracles/spire1.json
+
 ```
 
 The setup scripts can also be used configure Omnia as a relay running with `systemd`:
