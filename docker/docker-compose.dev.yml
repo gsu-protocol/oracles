@@ -19,11 +19,6 @@ x-omnia: &default
     OMNIA_STR_ethereum_network: testchain:8545
 
 services:
-  testchain:
-    build:
-      context: ../
-      dockerfile: Dockerfile.testchain
-
   feed:
     <<: *default
     volumes:

@@ -89,41 +89,67 @@ To get whitelisted on a Mainnet Oracle please submit a proposal in the Oracle se
 Your proposal will need to be ratified by MKR Governance to be enacted. Details of the proposal format can be found inside the Forum.
 
 ## Install with Nix
+## Development
 
-First you need `nix`:
-
-```sh
-curl -L https://nixos.org/nix/install | sh
-. /home/<USER>/.nix-profile/etc/profile.d/nix.sh
-```
-
-Add Maker build cache:
+To build from inside this repo, clone and run:
 
 ```sh
-nix run -f https://cachix.org/api/v1/install cachix -c cachix use maker
+nix-build
 ```
 
-Then run the following to make the `omnia`, `ssb-server` and `install-omnia`
-commands available in your user environment:
+You can then run `omnia` from `./result/bin/omnia`.
+
+To get a development environment with all dependencies run:
 
 ```sh
-nix-env -i -f https://github.com/chronicleprotocol/oracles/tarball/v1.13.3 # update this to the latest version
+nix-shell
+cd omnia
+./omnia.sh
 ```
 
-Get the Scuttlebot private network keys (caps) from an admin and put it in a file
-(e.g. called `~/caps.json`). The file should have the JSON format:
+Now you can start editing the `omnia` scripts and run them directly.
 
+### Update dependencies
 
-```json
-{
-	"shs": "<BASE64>",
-	"sign": "<BASE64>"
-}
+To update dependencies like `setzer` use `niv` e.g.:
+
+```sh
+nix-shell
+niv show
+niv update setzer
 ```
 
-You can use the `install-omnia` command to install Omnia as a `systemd`
-service, update your `/etc/omnia.conf`, `~/.ssb/config` and migrate a
-Scuttlebot secret and gossip log.
+To update NodeJS dependencies edit the `nix/node-packages.json` file and run:
+
+```sh
+nix-shell
+updateNodePackages
+```
+
+### Staging and release process
+
+To create a release candidate (RC) for staging, typically after a PR has
+passed its smoke and regression tests and is merged into `master`, checkout
+`master` and run:
+
+```sh
+nix-shell --run "release minor"
+```
+
+This should bump the version of `omnia` by Semver version level `minor`
+and create a new release branch with the resulting version
+(e.g. `release/1.1`) and a tag with the suffix `-rc` which indicates a
+release candidate that is ready for staging.
+
+When a release candidate has been tested in staging and is deemed stable you can
+run the same command in the release branch but without the Semver version level:
+
+```sh
+nix-shell --run release
+```
+
+This should add a Git tag to the current commit with its current version
+(without suffix) and move the `stable` tag there also.
 
 
 ### Configuring a feed
@@ -235,64 +261,3 @@ It consist of 3 available options:
 }
 ```
 
-## Development
-
-To build from inside this repo, clone and run:
-
-```sh
-nix-build
-```
-
-You can then run `omnia` from `./result/bin/omnia`.
-
-To get a development environment with all dependencies run:
-
-```sh
-nix-shell
-cd omnia
-./omnia.sh
-```
-
-Now you can start editing the `omnia` scripts and run them directly.
-
-### Update dependencies
-
-To update dependencies like `setzer` use `niv` e.g.:
-
-```sh
-nix-shell
-niv show
-niv update setzer
-```
-
-To update NodeJS dependencies edit the `nix/node-packages.json` file and run:
-
-```sh
-nix-shell
-updateNodePackages
-```
-
-### Staging and release process
-
-To create a release candidate (RC) for staging, typically after a PR has
-passed its smoke and regression tests and is merged into `master`, checkout
-`master` and run:
-
-```sh
-nix-shell --run "release minor"
-```
-
-This should bump the version of `omnia` by Semver version level `minor`
-and create a new release branch with the resulting version
-(e.g. `release/1.1`) and a tag with the suffix `-rc` which indicates a
-release candidate that is ready for staging.
-
-When a release candidate has been tested in staging and is deemed stable you can
-run the same command in the release branch but without the Semver version level:
-
-```sh
-nix-shell --run release
-```
-
-This should add a Git tag to the current commit with its current version
-(without suffix) and move the `stable` tag there also.
