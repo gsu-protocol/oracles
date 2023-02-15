@@ -176,14 +176,14 @@ install-omnia help
 The setup scripts can also be used configure Omnia as a feed running with `systemd`:
 ```
 
-./setup/run_feed.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
+sudo ./setup/run_feed.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
 
 ```
 
 The setup scripts can also be used configure Omnia as a relay running with `systemd`:
 ```
 
-./setup/run_it_relay.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
+sudo ./setup/run_it_relay.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
 
 ```
 
