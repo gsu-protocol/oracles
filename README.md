@@ -185,10 +185,14 @@ sudo ./setup/run_feed.sh --gofer /home/oracles/gofer.json --omnia /home/oracles/
 
 ```
 
-The setup scripts can also be used configure Omnia as a relay running with `systemd`:
+The setup scripts can also be used configure Omnia as a relay running with `systemd` but first make sure spire is running:
 ```
 
 sudo ./setup/run_it_relay.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
+
+for example:
+
+sudo ./setup/run_it_relay.sh --gofer /home/oracles/gofer.json --omnia /home/oracles/omnia_relay.json --spire /home/oracles/spire1.json
 
 ```
 
@@ -215,9 +219,7 @@ This is based on libp2p which is a peer-to-peer networking protocol designed to 
         "directPeersAddrs":[]}}
   ```
 
- **this attribute is reponsible for the making the peers, So we have to give the info for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median.** 
-
-You can get the peer address from the logs of spire, As we are running systemd services, So we have to use journalctl for getting the logs.
+ **this attribute is reponsible for the making the peers, So we have to give the info for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median.** You can get the peer address from the logs of spire, As we are running systemd services, So we have to use journalctl for getting the logs.
 
 ```
 sudo journalctl -u <spire-agent.service> -n 100 -b -f
