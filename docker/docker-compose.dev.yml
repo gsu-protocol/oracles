@@ -6,33 +6,24 @@ x-omnia: &default
     dockerfile: Dockerfile.omnia-dev
   environment: &env
     ETH_GAS: 7000000
-    SSB_FILE_SET: /src/systemd/ssb-config.json
-    SSB_SET_connections_incoming_net__port: 8008
-    SSB_SET_connections_incoming_ws__port: 8989
-    SSB_SET_caps: |
-      {
-        "shs": "BRsTikbASMIC6jAvsIbZy24Wd6IpLQ5FbEx1oyooGb8=",
-        "sign": "HOGP1DI4ZybjiHYv7SvaadeSLSnt1MQ2bDo2v7aszh0="
-      }
-    OMNIA_STR_ethereum_keystore: /etc/omnia/keystore
-    OMNIA_STR_ethereum_password: /etc/omnia/password
-    OMNIA_STR_ethereum_network: testchain:8545
 
 services:
   feed:
     <<: *default
+    network_mode: host
     volumes:
       - nix:/nix
-      - ../:/src
-      - ../testchain/keystore:/etc/omnia/keystore
-      - ../testchain/keystore/password:/etc/omnia/password
+      - ../:/src 
+      - /home/admin/keystore:/etc/omnia/keystore
+      - /home/admin/.ethereum/keystore:/home/admin/.ethereum/keystore
+      - /home/admin/.ethereum/keystore/.pass:/home/admin/.ethereum/keystore/.pass
+      - /home/admin/keystore/.pass:/etc/omnia/password
       - ./ssb/feed:/root/.ssb/secret
+      - ../omnia/config/feed.conf:/src/omnia/config/feed.conf
     environment:
       <<: *env
       OMNIA_FILE_SET: /src/omnia/config/feed.conf
-      OMNIA_STR_ethereum_from: "0x131ea366b4aae41859101fe0954fe4723329cd71"
-      SSB_STR_connections_incoming_net__external: feed
-      SSB_STR_connections_incoming_ws__external: feed
+      OMNIA_CONFIG: /src/omnia/config/feed.conf
 
   relay:
     <<: *default
