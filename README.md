@@ -104,6 +104,13 @@ spire agent -c <CONFIG_PATH> --log.verbosity debug
 systemctl start <spire-agent.service>
 
 ```
+
+### command to run ssb-server systemd
+```
+systemctl start <ssb-server.service>
+
+```
+
 ### how it will work
 
  we should run the 3 feeds with the 3 spires 
@@ -115,6 +122,62 @@ systemctl start <spire-agent.service>
 
 The installed Scuttlebot config can be found in `~/.ssb.config`, more details
 about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
+
+
+
+
+### Creating and Accepting SSB Invites through Docker
+
+In this tutorial, we will be discussing how to create and accept SSB invites using Docker containers.
+Prerequisites
+
+Before you begin, ensure that you have the following:
+
+    Docker installed on your machine
+    An SSB server running in a Docker container
+    SSB CLI installed on your machine
+OR 
+Without Docker 
+  `npm install ssb-server -g`
+Creating an SSB Invite
+
+To create an SSB invite using Docker, first, run the following command to get a shell in your SSB server container:
+
+bash
+
+`docker exec -it <container_name> sh`
+
+Replace <container_name> with the name of your SSB server container.
+
+Once you have a shell in the container, run the following command to create an SSB invite even without docker:
+
+`ssb-server invite.create 1`
+
+This will output a JSON object containing the invite code.
+
+Exit the container shell by running exit.
+Accepting an SSB Invite
+
+To accept an SSB invite using Docker, first, run the following command to get a shell in your SSB server container:
+
+bash
+
+docker exec -it <container_name> sh
+
+Replace <container_name> with the name of your SSB server container.
+
+Once you have a shell in the container, run the following command to accept the invite:
+
+php
+
+`ssb-server invite.accept <invite_code>`
+
+Replace <invite_code> with the invite code obtained in the previous step.
+
+Exit the container shell by running exit.
+
+Congratulations, you have successfully created and accepted an SSB invite using Docker containers!
+
 
 ## Relay Gas Price configuration
 
