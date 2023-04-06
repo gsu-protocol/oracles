@@ -89,7 +89,7 @@ This is based on libp2p which is a peer-to-peer networking protocol designed to 
         "directPeersAddrs":[]}}
   ```
 
- this attribute is reponsible for the making the peers, So we have to give the info for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median. You can get the peer address from the logs of spire, As we are running systemd services, So we have to use journalctl for getting the logs.
+ One of these attributes is the "transport" attribute, which uses libp2p to establish direct peer-to-peer connections between nodes without relying on a central server or infrastructure, So we have to give the info for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median.To obtain the peer addresses, you can check the logs of Spire using journalctl, as Spire runs as a systemd service. Once you have the peer addresses, you can add them to the "directPeersAddrs" array in the "transport" attribute of the Spire configuration file.
 
 ```
 sudo journalctl -u <spire-agent.service> -n 100 -b -f
@@ -111,6 +111,37 @@ systemctl start <ssb-server.service>
 
 ```
 
+The installed Scuttlebot config can be found in `~/.ssb.config`, more details
+about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
+
+### Creating and Accepting SSB Invites through Docker
+
+In this tutorial, we will discuss how to create and accept SSB invites without using Docker containers. Here are the prerequisites you need to have before starting:
+
+    SSB server installed on your machine
+    SSB CLI installed on your machine
+
+If you don't have the SSB server installed, you can install it using the following command:
+
+`npm install ssb-server -g`
+
+Creating an SSB Invite
+
+To create an SSB invite without using Docker, open a terminal window and run the following command:
+
+`ssb-server invite.create 1`
+
+This will output a JSON object containing the invite code.
+
+Accepting an SSB Invite
+
+To accept an SSB invite without using Docker, open a terminal window and run the following command:
+
+`ssb-server invite.accept <invite_code>`
+
+Replace <invite_code> with the invite code obtained in the previous step.
+
+
 ### how it will work
 
  we should run the 3 feeds with the 3 spires 
@@ -118,81 +149,7 @@ systemctl start <ssb-server.service>
  means the config file have the right omnia addr pasted in feed object of spire's config
 
 
-
-
-The installed Scuttlebot config can be found in `~/.ssb.config`, more details
-about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
-
-
-
-
-### Creating and Accepting SSB Invites through Docker
-
-In this tutorial, we will be discussing how to create and accept SSB invites using Docker containers.
-Prerequisites
-
-Before you begin, ensure that you have the following:
-
-    Docker installed on your machine
-    An SSB server running in a Docker container
-    SSB CLI installed on your machine
-OR 
-Without Docker 
-  `npm install ssb-server -g`
-Creating an SSB Invite
-
-To create an SSB invite using Docker, first, run the following command to get a shell in your SSB server container:
-
-bash
-
-`docker exec -it <container_name> sh`
-
-Replace <container_name> with the name of your SSB server container.
-
-Once you have a shell in the container, run the following command to create an SSB invite even without docker:
-
-`ssb-server invite.create 1`
-
-This will output a JSON object containing the invite code.
-
-Exit the container shell by running exit.
-Accepting an SSB Invite
-
-To accept an SSB invite using Docker, first, run the following command to get a shell in your SSB server container:
-
-bash
-
-docker exec -it <container_name> sh
-
-Replace <container_name> with the name of your SSB server container.
-
-Once you have a shell in the container, run the following command to accept the invite:
-
-php
-
-`ssb-server invite.accept <invite_code>`
-
-Replace <invite_code> with the invite code obtained in the previous step.
-
-Exit the container shell by running exit.
-
-Congratulations, you have successfully created and accepted an SSB invite using Docker containers!
-
-
-## Relay Gas Price configuration
-
-Adding a new configuration parameter to `ethereum` relay config section: `gasPrice`.
-It consist of 3 available options: 
-
-`source` - source of gas price. Default value: `node`
-
-**There is currently only a single value available.** 
-
- - `node` - Getting Gas Price from node (using `cast gas-price`).
-
-`multiplier` - A number the gas pice will be multiplied by after fetching. **Default value: 1**
-
-**Example configuration:**
+**Example configuration:Relay**
 
 ```json
 {
@@ -215,3 +172,39 @@ It consist of 3 available options:
 }
 ```
 
+**Example configuration:Feed**
+```json
+{
+  "mode": "feed",
+  "ethereum": {
+    "from": "0x86B5B8Fe2B467F733c0624e13b9Df08867d94B96",
+    "keystore": "/home/admin/.ethereum/keystore",
+    "password": "/home/admin/.ethereum/keystore/.pass",
+    "type": "ethereum",
+    "network": "http://127.0.0.1:8545"
+  },
+  "options": {
+    "interval": 60,
+    "msgLimit": 35,
+    "srcTimeout": 10,
+    "setzerTimeout": 10,
+    "setzerCacheExpiry": 120,
+    "setzerMinMedian": 1,
+    "setzerEthRpcUrl": "http://127.0.0.1:9989",
+    "verbose": true,
+    "logFormat": "text"
+  },
+  "sources": [
+    "gofer","setzer"
+  ],
+  "transports": [
+    "spire"
+  ],
+  "pairs": {
+    "ETH/USD": {
+      "msgExpiration": 1800,
+      "msgSpread": 0.5
+    }
+  }
+}
+```
