@@ -27,6 +27,8 @@ Each Feed runs a Feed client which pulls prices redundantly with [Setzer]() and 
 
 Relays monitor the broadcast messages, check for liveness, and homogenize the pricing data and signatures into a single ethereum transaction to be posted to the on-chain oracles.
 
+### Configuration Files
+The sample generic configurtion file are present in `./systemd/` folder.
 
 ## Install with Nix
 
@@ -116,20 +118,11 @@ about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
 
 ### Creating and Accepting SSB Invites through Docker
 
-In this tutorial, we will discuss how to create and accept SSB invites without using Docker containers. Here are the prerequisites you need to have before starting:
-
-    SSB server installed on your machine
-    SSB CLI installed on your machine
-
-If you don't have the SSB server installed, you can install it using the following command:
-
-`npm install ssb-server -g`
+Open the systemd file of ssb-server.service to lookup the binary of ssb-server.
 
 Creating an SSB Invite
 
-To create an SSB invite without using Docker, open a terminal window and run the following command:
-
-`ssb-server invite.create 1`
+`ssb-server invite.create 1` means `<path of ssb-server> invite.create 1`
 
 This will output a JSON object containing the invite code.
 
