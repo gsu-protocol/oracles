@@ -116,7 +116,7 @@ systemctl start <ssb-server.service>
 The installed Scuttlebot config can be found in `~/.ssb.config`, more details
 about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
 
-### Creating and Accepting SSB Invites through Docker
+### Creating and Accepting SSB Invites 
 
 Open the systemd file of ssb-server.service to lookup the binary of ssb-server.
 
