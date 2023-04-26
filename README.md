@@ -27,6 +27,8 @@ Each Feed runs a Feed client which pulls prices redundantly with [Setzer]() and 
 
 Relays monitor the broadcast messages, check for liveness, and homogenize the pricing data and signatures into a single ethereum transaction to be posted to the on-chain oracles.
 
+### Configuration Files
+The sample generic configurtion file are present in `./systemd/` folder.
 
 ## Install with Nix
 
@@ -47,7 +49,7 @@ The setup scripts can also be used configure Omnia as a feed running with `syste
 
 ```
 
-sudo ./setup/run_feed.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
+sudo ./setup/run_feed.sh --gofer <ABSOLUTE_PATH_OF_CONFIG> --omnia <ABSOLUTE_PATH_OF_CONFIG> --spire <ABSOLUTE_PATH_OF_CONFIG>
 
 for example:
 
@@ -58,7 +60,7 @@ sudo ./setup/run_feed.sh --gofer /home/oracles/gofer.json --omnia /home/oracles/
 The setup scripts can also be used configure Omnia as a relay running with `systemd` but first make sure spire is running:
 ```
 
-sudo ./setup/run_it_relay.sh --gofer <PATH_OF_CONFIG> --omnia <PATH_OF_CONFIG> --spire <PATH_OF_CONFIG>
+sudo ./setup/run_it_relay.sh --gofer <ABSOLUTE_PATH_OF_CONFIG> --omnia <ABSOLUTE_PATH_OF_CONFIG> --spire <ABSOLUTE_PATH_OF_CONFIG>
 
 for example:
 
@@ -82,18 +84,20 @@ systemctl start spire-agent.service
 
 This is based on libp2p which is a peer-to-peer networking protocol designed to enable decentralized communication and file sharing over the internet. It is a modular, open-source networking protocol that allows nodes to communicate with each other directly, without the need for a central server or infrastructure.
 
-**spire have config file which consists of different attributes**
+
+ One of these attributes is the "transport" attribute, which uses libp2p to establish direct peer-to-peer connections between nodes without relying on a central server or infrastructure, So we have to give the listenAddrs for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median.To obtain the peer addresses, you can check the logs of Spire using journalctl, as Spire runs as a systemd service. Once you have the peer addresses, then ** you can add them to the "directPeersAddrs" array to connect peers in the "transport" attribute of the Spire configuration file. **
+
+```
+sudo journalctl -u <spire-agent.service> -n 100 -b -f
+```
+
+
+**add peerIDs in this attr to connect spire with each other**
 ```json 
 "transport":{
       "libp2p": {
         "directPeersAddrs":[]}}
   ```
-
- this attribute is reponsible for the making the peers, So we have to give the info for example `/ip4/192.168.18.109/tcp/37705/p2p/12D3KooWPFpaE13gph8p6jdNGJv1M6fwDro8kdst53MUzVpuSJUL` i.e **"\<ip-version>/\<host>/\<protocol>/\<port>/\<type>/\<peer_id>"** w.r.t the quorum of median. You can get the peer address from the logs of spire, As we are running systemd services, So we have to use journalctl for getting the logs.
-
-```
-sudo journalctl -u <spire-agent.service> -n 100 -b -f
-```
 
 ### command to run spire
 ```
@@ -104,6 +108,35 @@ spire agent -c <CONFIG_PATH> --log.verbosity debug
 systemctl start <spire-agent.service>
 
 ```
+
+### command to run ssb-server systemd
+```
+systemctl start <ssb-server.service>
+
+```
+
+The installed Scuttlebot config can be found in `~/.ssb.config`, more details
+about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
+
+### Creating and Accepting SSB Invites 
+
+Open the systemd file of ssb-server.service to lookup the binary of ssb-server.
+
+Creating an SSB Invite
+
+`ssb-server invite.create 1` means `<path of ssb-server> invite.create 1`
+
+This will output a JSON object containing the invite code.
+
+Accepting an SSB Invite
+
+To accept an SSB invite without using Docker, open a terminal window and run the following command:
+
+`ssb-server invite.accept <invite_code>`
+
+Replace <invite_code> with the invite code obtained in the previous step.
+
+
 ### how it will work
 
  we should run the 3 feeds with the 3 spires 
@@ -111,25 +144,7 @@ systemctl start <spire-agent.service>
  means the config file have the right omnia addr pasted in feed object of spire's config
 
 
-
-
-The installed Scuttlebot config can be found in `~/.ssb.config`, more details
-about the [Scuttlebot config](https://github.com/ssbc/ssb-config#configuration).
-
-## Relay Gas Price configuration
-
-Adding a new configuration parameter to `ethereum` relay config section: `gasPrice`.
-It consist of 3 available options: 
-
-`source` - source of gas price. Default value: `node`
-
-**There is currently only a single value available.** 
-
- - `node` - Getting Gas Price from node (using `cast gas-price`).
-
-`multiplier` - A number the gas pice will be multiplied by after fetching. **Default value: 1**
-
-**Example configuration:**
+**Example configuration:Relay**
 
 ```json
 {
@@ -152,3 +167,39 @@ It consist of 3 available options:
 }
 ```
 
+**Example configuration:Feed**
+```json
+{
+  "mode": "feed",
+  "ethereum": {
+    "from": "0x86B5B8Fe2B467F733c0624e13b9Df08867d94B96",
+    "keystore": "/home/admin/.ethereum/keystore",
+    "password": "/home/admin/.ethereum/keystore/.pass",
+    "type": "ethereum",
+    "network": "http://127.0.0.1:8545"
+  },
+  "options": {
+    "interval": 60,
+    "msgLimit": 35,
+    "srcTimeout": 10,
+    "setzerTimeout": 10,
+    "setzerCacheExpiry": 120,
+    "setzerMinMedian": 1,
+    "setzerEthRpcUrl": "http://127.0.0.1:9989",
+    "verbose": true,
+    "logFormat": "text"
+  },
+  "sources": [
+    "gofer","setzer"
+  ],
+  "transports": [
+    "spire"
+  ],
+  "pairs": {
+    "ETH/USD": {
+      "msgExpiration": 1800,
+      "msgSpread": 0.5
+    }
+  }
+}
+```
